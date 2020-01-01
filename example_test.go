@@ -11,3 +11,11 @@ func ExampleMatches() {
 	// true
 	// true
 }
+
+func ExampleExtract() {
+	params := mqttpattern.Extract("foo/+something/+otherthing", "foo/bar/baz")
+	fmt.Printf("%v", params)
+
+	// Output:
+	// map[otherthing:baz something:bar]
+}
