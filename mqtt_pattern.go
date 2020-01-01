@@ -1,9 +1,10 @@
 package mqttpattern
 
-import "strings"
+import (
+	"strings"
+)
 
 const seprator = "/"
-
 const single = '+'
 const all = '#'
 
@@ -34,4 +35,42 @@ func Matches(pattern string, topic string) bool {
 	}
 
 	return patternLen == topicLen
+}
+
+// Extract Traverses the pattern and attempts to fetch parameters from the topic.
+// Useful if you know in advance that your topic will be valid and want to extract data.
+// If the topic doesn't match, or the pattern doesn't contain named wildcards, returns an empty map.
+//
+// WARNING: Do not use this for validation.
+func Extract(pattern string, topic string) map[string]string {
+	params := make(map[string]string)
+	patternSegments := strings.Split(pattern, seprator)
+	topicSegments := strings.Split(topic, seprator)
+	topicLen := len(topicSegments)
+
+	for i := range patternSegments {
+		if len(patternSegments[i]) == 1 {
+			continue
+		}
+
+		if topicLen-1 < i {
+			break
+		}
+
+		pLen := len(patternSegments[i])
+		if pLen == 0 {
+			continue
+		}
+
+		paramName := patternSegments[i][1:pLen]
+		if patternSegments[i][0] == all {
+			params[paramName] = strings.Join(topicSegments[i:len(topicSegments)], seprator)
+			break
+		}
+		if patternSegments[i][0] == single {
+			params[paramName] = topicSegments[i]
+		}
+	}
+
+	return params
 }
