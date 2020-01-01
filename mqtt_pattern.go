@@ -26,9 +26,13 @@ func Matches(pattern string, topic string) bool {
 	lastIndex := patternLen - 1
 
 	for i := range patternSegments {
+		pLen := len(patternSegments[i])
 		tLen := len(topicSegments[i])
 
-		if len(patternSegments[i]) == 0 && tLen == 0 {
+		if pLen == 0 && tLen == 0 {
+			continue
+		}
+		if pLen == 0 {
 			continue
 		}
 		if tLen == 0 && patternSegments[i][0] != all {
@@ -83,12 +87,19 @@ func Extract(pattern string, topic string) map[string]string {
 	return params
 }
 
+// Fill Reverse of extract, traverse the pattern and fill in params with keys in a map.
+// Missing keys for + and # params are set to empty string.
 func Fill(pattern string, params map[string]string) string {
 	patternSegments := strings.Split(pattern, seprator)
 	segments := make([]string, 0, len(patternSegments))
 
 	for i := range patternSegments {
-		patternParam := patternSegments[i][1:len(patternSegments[i])]
+		pLen := len(patternSegments[i])
+		if pLen == 0 {
+			continue
+		}
+
+		patternParam := patternSegments[i][1:pLen]
 		paramValue, ok := params[patternParam]
 
 		if patternSegments[i][0] == all {
@@ -118,6 +129,10 @@ func Clean(pattern string) string {
 	cleanedSegments := make([]string, 0, len(patternSegments))
 
 	for i := range patternSegments {
+		if len(patternSegments[i]) == 0 {
+			continue
+		}
+
 		if patternSegments[i][0] == all {
 			cleanedSegments = append(cleanedSegments, string(all))
 		} else if patternSegments[i][0] == single {

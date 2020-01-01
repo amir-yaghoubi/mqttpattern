@@ -13,6 +13,8 @@ func TestMattches(t *testing.T) {
 		topic   string
 		result  bool
 	}{
+		{name: "Supports empty patterns", pattern: "", topic: "foo/bar/baz", result: false},
+		{name: "Supports empty patterns", pattern: "foo/bar/baz", topic: "", result: false},
 		{name: "Supports patterns with no wildcards", pattern: "foo/bar/baz", topic: "foo/bar/baz", result: true},
 		{name: "Doesn't match different pattern and topic", pattern: "foo/bar/baz", topic: "bar/foo/baz", result: false},
 		{name: "Supports # at the beginning", pattern: "#", topic: "foo/bar/baz", result: true},
@@ -91,6 +93,7 @@ func TestFill(t *testing.T) {
 		params  map[string]string
 		result  string
 	}{
+		{name: "Returns empty string for empty patterns", pattern: "", params: map[string]string{"bar": "BAR"}, result: ""},
 		{name: "Fills in pattern with both types of wildcards", pattern: "foo/+bar/#baz", params: map[string]string{"bar": "BAR", "baz": "BAZ"}, result: "foo/BAR/BAZ"},
 		{name: "Fills missing + params with \"\"", pattern: "foo/+bar", params: make(map[string]string), result: "foo/"},
 	}
@@ -109,6 +112,7 @@ func TestClean(t *testing.T) {
 		pattern string
 		result  string
 	}{
+		{name: "Returns empty string for empty patterns", pattern: "", result: ""},
 		{name: "Works when there aren't any named parameter", pattern: "foo/+/bar/#", result: "foo/+/bar/#"},
 		{name: "Removes named parameters", pattern: "foo/+something/bar/#otherthing", result: "foo/+/bar/#"},
 	}
