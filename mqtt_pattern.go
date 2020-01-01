@@ -83,12 +83,39 @@ func Extract(pattern string, topic string) map[string]string {
 	return params
 }
 
+func Fill(pattern string, params map[string]string) string {
+	patternSegments := strings.Split(pattern, seprator)
+	segments := make([]string, 0, len(patternSegments))
+
+	for i := range patternSegments {
+		patternParam := patternSegments[i][1:len(patternSegments[i])]
+		paramValue, ok := params[patternParam]
+
+		if patternSegments[i][0] == all {
+			if ok {
+				segments = append(segments, paramValue)
+			} else {
+				segments = append(segments, "")
+			}
+			break
+		} else if patternSegments[i][0] == single {
+			if ok {
+				segments = append(segments, paramValue)
+			} else {
+				segments = append(segments, "")
+			}
+		} else {
+			segments = append(segments, patternSegments[i])
+		}
+	}
+
+	return strings.Join(segments, seprator)
+}
+
 // Clean Removes the named parameters from a pattern.
 func Clean(pattern string) string {
 	patternSegments := strings.Split(pattern, seprator)
-	pLen := len(patternSegments)
-
-	cleanedSegments := make([]string, 0, pLen)
+	cleanedSegments := make([]string, 0, len(patternSegments))
 
 	for i := range patternSegments {
 		if patternSegments[i][0] == all {

@@ -84,6 +84,25 @@ func TestExec(t *testing.T) {
 	}
 }
 
+func TestFill(t *testing.T) {
+	testCases := []struct {
+		name    string
+		pattern string
+		params  map[string]string
+		result  string
+	}{
+		{name: "Fills in pattern with both types of wildcards", pattern: "foo/+bar/#baz", params: map[string]string{"bar": "BAR", "baz": "BAZ"}, result: "foo/BAR/BAZ"},
+		{name: "Fills missing + params with \"\"", pattern: "foo/+bar", params: make(map[string]string), result: "foo/"},
+	}
+
+	for _, tt := range testCases {
+		result := mqttpattern.Fill(tt.pattern, tt.params)
+		if result != tt.result {
+			t.Errorf("%s | expected %s but received %s", tt.name, tt.result, result)
+		}
+	}
+}
+
 func TestClean(t *testing.T) {
 	testCases := []struct {
 		name    string

@@ -28,6 +28,14 @@ func ExampleExec() {
 	// map[otherthing:baz something:bar]
 }
 
+func ExampleFill() {
+	cleanPattern := mqttpattern.Fill("foo/+bar/#baz", map[string]string{"bar": "BAR", "baz": "BAZ"})
+	fmt.Printf("%v", cleanPattern)
+
+	// Output:
+	// foo/BAR/BAZ
+}
+
 func ExampleClean() {
 	cleanPattern := mqttpattern.Clean("foo/+something/#otherthing")
 	fmt.Printf("%v", cleanPattern)
