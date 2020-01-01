@@ -11,7 +11,7 @@ To install mqttpattern package:
 1. Install using go get:
 
 ```bash
-go get amir-yaghoubi/mqttpattern
+go get github.com/amir-yaghoubi/mqttpattern
 ```
 
 2. Import it in your code:
