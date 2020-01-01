@@ -82,3 +82,23 @@ func Extract(pattern string, topic string) map[string]string {
 
 	return params
 }
+
+// Clean Removes the named parameters from a pattern.
+func Clean(pattern string) string {
+	patternSegments := strings.Split(pattern, seprator)
+	pLen := len(patternSegments)
+
+	cleanedSegments := make([]string, 0, pLen)
+
+	for i := range patternSegments {
+		if patternSegments[i][0] == all {
+			cleanedSegments = append(cleanedSegments, string(all))
+		} else if patternSegments[i][0] == single {
+			cleanedSegments = append(cleanedSegments, string(single))
+		} else {
+			cleanedSegments = append(cleanedSegments, patternSegments[i])
+		}
+	}
+
+	return strings.Join(cleanedSegments, seprator)
+}

@@ -83,3 +83,21 @@ func TestExec(t *testing.T) {
 		}
 	}
 }
+
+func TestClean(t *testing.T) {
+	testCases := []struct {
+		name    string
+		pattern string
+		result  string
+	}{
+		{name: "Works when there aren't any named parameter", pattern: "foo/+/bar/#", result: "foo/+/bar/#"},
+		{name: "Removes named parameters", pattern: "foo/+something/bar/#otherthing", result: "foo/+/bar/#"},
+	}
+
+	for _, tt := range testCases {
+		result := mqttpattern.Clean(tt.pattern)
+		if result != tt.result {
+			t.Errorf("%s | expected %s but received %s", tt.name, tt.result, result)
+		}
+	}
+}
