@@ -96,6 +96,7 @@ func TestFill(t *testing.T) {
 		{name: "Returns empty string for empty patterns", pattern: "", params: map[string]string{"bar": "BAR"}, result: ""},
 		{name: "Fills in pattern with both types of wildcards", pattern: "foo/+bar/#baz", params: map[string]string{"bar": "BAR", "baz": "BAZ"}, result: "foo/BAR/BAZ"},
 		{name: "Fills missing + params with \"\"", pattern: "foo/+bar", params: make(map[string]string), result: "foo/"},
+		{name: "Fills missing # params with \"\"", pattern: "foo/#bar", params: make(map[string]string), result: "foo/"},
 	}
 
 	for _, tt := range testCases {
