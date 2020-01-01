@@ -61,3 +61,25 @@ func TestExtract(t *testing.T) {
 		}
 	}
 }
+
+func TestExec(t *testing.T) {
+	testCases := []struct {
+		name    string
+		pattern string
+		topic   string
+		result  map[string]string
+	}{
+		{name: "Returns nil if doesn't match", pattern: "foo/bar", topic: "foo/bar/baz", result: nil},
+		{name: "Returns params if they can be parsed", pattern: "foo/+bar/#baz", topic: "foo/bar/baz", result: map[string]string{"bar": "bar", "baz": "baz"}},
+	}
+
+	for _, tt := range testCases {
+		result := mqttpattern.Exec(tt.pattern, tt.topic)
+
+		rStr := fmt.Sprintf("%v", result)
+		trStr := fmt.Sprintf("%v", tt.result)
+		if rStr != trStr {
+			t.Errorf("%s | expected %s but received %s", tt.name, trStr, rStr)
+		}
+	}
+}

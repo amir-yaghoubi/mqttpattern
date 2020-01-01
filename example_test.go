@@ -19,3 +19,11 @@ func ExampleExtract() {
 	// Output:
 	// map[otherthing:baz something:bar]
 }
+
+func ExampleExec() {
+	params := mqttpattern.Exec("foo/+something/+otherthing", "foo/bar/baz")
+	fmt.Printf("%v", params)
+
+	// Output:
+	// map[otherthing:baz something:bar]
+}

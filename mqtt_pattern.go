@@ -8,6 +8,14 @@ const seprator = "/"
 const single = '+'
 const all = '#'
 
+// Exec Validates that topic fits the pattern and parses out any parameters. If the topic doesn't match, it returns empty map
+func Exec(pattern string, topic string) map[string]string {
+	if Matches(pattern, topic) {
+		return Extract(pattern, topic)
+	}
+	return nil
+}
+
 // Matches validates whether topic fits the pattern or not
 func Matches(pattern string, topic string) bool {
 	patternSegments := strings.Split(pattern, seprator)
