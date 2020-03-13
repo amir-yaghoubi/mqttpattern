@@ -17,7 +17,7 @@ go get github.com/amir-yaghoubi/mqtt-pattern
 2. Import it in your code:
 
 ```bash
-import mqttpattern "github.com/amir-yaghoubi/mqtt-pattern"
+import mqttpattern "github.com/amir-yaghoubi/mqttpattern"
 ```
 
 ## Quick start
@@ -27,7 +27,7 @@ package main
 
 import (
 	"fmt"
-	mqttpattern "github.com/amir-yaghoubi/mqtt-pattern"
+	mqttpattern "github.com/amir-yaghoubi/mqttpattern"
 )
 
 func main() {
