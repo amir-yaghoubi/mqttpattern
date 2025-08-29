@@ -1,10 +1,12 @@
 package mqttpattern_test
 
-import "testing"
+import (
+	"testing"
 
-import mqttpattern "github.com/amir-yaghoubi/mqtt-pattern"
+	"fmt"
 
-import "fmt"
+	mqttpattern "github.com/amir-yaghoubi/mqttpattern"
+)
 
 func TestMattches(t *testing.T) {
 	testCases := []struct {
@@ -34,6 +36,77 @@ func TestMattches(t *testing.T) {
 		if mqttpattern.Matches(tt.pattern, tt.topic) != tt.result {
 			t.Error(tt.name)
 		}
+	}
+}
+
+// TestPatternLongerThanTopic tests that the Matches function correctly handles
+// cases where the pattern has more segments than the topic.
+// This was previously causing "index out of range" panics.
+func TestPatternLongerThanTopic(t *testing.T) {
+	// Test case that previously caused panic
+	// Pattern: "test/+/topic" (3 segments)
+	// Topic: "test/abc" (2 segments)
+	// Should return false (no match) without panicking
+
+	pattern := "test/+/topic"
+	topic := "test/abc" // Has fewer segments than pattern
+
+	result := mqttpattern.Matches(pattern, topic)
+
+	// Should return false since topic doesn't have enough segments
+	if result {
+		t.Errorf("Expected false but got true for pattern '%s' and topic '%s'", pattern, topic)
+	}
+}
+
+// TestPatternLongerThanTopicVariations tests additional cases where patterns are longer than topics
+func TestPatternLongerThanTopicVariations(t *testing.T) {
+	testCases := []struct {
+		name     string
+		pattern  string
+		topic    string
+		expected bool
+	}{
+		{
+			name:     "Pattern longer than topic - simple case",
+			pattern:  "device/+/sensor",
+			topic:    "device/123",
+			expected: false, // Topic doesn't have enough segments
+		},
+		{
+			name:     "Pattern longer than topic - multiple segments",
+			pattern:  "api/+/users/+/profile",
+			topic:    "api/v1/users",
+			expected: false, // Topic doesn't have enough segments
+		},
+		{
+			name:     "Pattern much longer than topic",
+			pattern:  "a/b/c/d/e",
+			topic:    "a/b",
+			expected: false, // Topic doesn't have enough segments
+		},
+		{
+			name:     "Pattern with hash wildcard at end should not match exact topic",
+			pattern:  "device/sensor/#",
+			topic:    "device/sensor",
+			expected: false, // # requires at least one more segment after device/sensor/
+		},
+		{
+			name:     "Pattern with hash wildcard should match longer topic",
+			pattern:  "device/#",
+			topic:    "device/sensor/123/data",
+			expected: true, // # matches everything after device/
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			result := mqttpattern.Matches(testCase.pattern, testCase.topic)
+			if result != testCase.expected {
+				t.Errorf("For pattern '%s' and topic '%s', expected %v but got %v",
+					testCase.pattern, testCase.topic, testCase.expected, result)
+			}
+		})
 	}
 }
 
