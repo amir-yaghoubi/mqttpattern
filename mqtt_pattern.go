@@ -28,6 +28,12 @@ func Matches(pattern string, topic string) bool {
 
 	for i := range patternSegments {
 		pLen := len(patternSegments[i])
+
+		if i >= topicLen {
+			// Pattern has more segments than topic - this should not match
+			return false
+		}
+
 		tLen := len(topicSegments[i])
 
 		if pLen == 0 && tLen == 0 {
