@@ -125,3 +125,60 @@ func TestClean(t *testing.T) {
 		}
 	}
 }
+
+func TestHasExtractions(t *testing.T) {
+	testCases := []struct {
+		name     string
+		pattern  string
+		expected bool
+	}{
+		// Patterns with extractions (should return true)
+		{name: "Single level wildcard with extraction", pattern: "+userId", expected: true},
+		{name: "Multi level wildcard with extraction", pattern: "#topic", expected: true},
+		{name: "Mixed pattern with single extraction", pattern: "user/+userId/profile", expected: true},
+		{name: "Mixed pattern with multi extraction", pattern: "user/+userId/data/#topic", expected: true},
+		{name: "Multiple extractions", pattern: "+category/+userId/+action", expected: true},
+		{name: "Extraction at beginning", pattern: "+start/middle/end", expected: true},
+		{name: "Extraction in middle", pattern: "start/+middle/end", expected: true},
+		{name: "Extraction at end with single wildcard", pattern: "start/middle/+end", expected: true},
+		{name: "Extraction at end with multi wildcard", pattern: "start/middle/#end", expected: true},
+		{name: "Complex pattern with multiple extractions", pattern: "api/+version/users/+userId/posts/#postData", expected: true},
+		{name: "Long parameter names", pattern: "device/+deviceIdentifier/sensor/+sensorType", expected: true},
+
+		// Patterns without extractions (should return false)
+		{name: "No wildcards", pattern: "user/profile/data", expected: false},
+		{name: "Single level wildcard only", pattern: "+", expected: false},
+		{name: "Multi level wildcard only", pattern: "#", expected: false},
+		{name: "Mixed pattern with bare wildcards", pattern: "user/+/profile", expected: false},
+		{name: "Mixed pattern with bare multi wildcard", pattern: "user/profile/#", expected: false},
+		{name: "Multiple bare wildcards", pattern: "+/+/+", expected: false},
+		{name: "Bare wildcards in middle", pattern: "start/+/middle/+/end", expected: false},
+		{name: "Bare multi wildcard in middle", pattern: "start/#/end", expected: false},
+		{name: "Complex bare pattern", pattern: "api/+/users/+/posts/#", expected: false},
+
+		// Edge cases
+		{name: "Empty string", pattern: "", expected: false},
+		{name: "Single character", pattern: "a", expected: false},
+		{name: "Just separator", pattern: "/", expected: false},
+		{name: "Wildcard followed by separator", pattern: "+/", expected: false},
+		{name: "Multi wildcard followed by separator", pattern: "#/", expected: false},
+		{name: "Mixed bare and extraction", pattern: "+/+param", expected: true},
+		{name: "Extraction then bare", pattern: "+param/+", expected: true},
+
+		// Patterns ending with extractions (edge case for range bounds)
+		{name: "Pattern ending with single extraction", pattern: "data/+param", expected: true},
+		{name: "Pattern ending with multi extraction", pattern: "data/#param", expected: true},
+		{name: "Single extraction only", pattern: "+param", expected: true},
+		{name: "Multi extraction only", pattern: "#param", expected: true},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			result := mqttpattern.HasExtractions(testCase.pattern)
+			if result != testCase.expected {
+				t.Errorf("For pattern '%s', expected %v but got %v",
+					testCase.pattern, testCase.expected, result)
+			}
+		})
+	}
+}
