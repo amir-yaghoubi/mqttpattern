@@ -4,7 +4,8 @@ import (
 	"strings"
 )
 
-const seprator = "/"
+const separator = "/"
+const separatorRune = '/'
 const single = '+'
 const all = '#'
 
@@ -18,8 +19,8 @@ func Exec(pattern string, topic string) map[string]string {
 
 // Matches validates whether topic fits the pattern or not
 func Matches(pattern string, topic string) bool {
-	patternSegments := strings.Split(pattern, seprator)
-	topicSegments := strings.Split(topic, seprator)
+	patternSegments := strings.Split(pattern, separator)
+	topicSegments := strings.Split(topic, separator)
 
 	patternLen := len(patternSegments)
 	topicLen := len(topicSegments)
@@ -56,8 +57,8 @@ func Matches(pattern string, topic string) bool {
 // WARNING: Do not use this for validation.
 func Extract(pattern string, topic string) map[string]string {
 	params := make(map[string]string)
-	patternSegments := strings.Split(pattern, seprator)
-	topicSegments := strings.Split(topic, seprator)
+	patternSegments := strings.Split(pattern, separator)
+	topicSegments := strings.Split(topic, separator)
 	topicLen := len(topicSegments)
 
 	for i := range patternSegments {
@@ -76,7 +77,7 @@ func Extract(pattern string, topic string) map[string]string {
 
 		paramName := patternSegments[i][1:pLen]
 		if patternSegments[i][0] == all {
-			params[paramName] = strings.Join(topicSegments[i:len(topicSegments)], seprator)
+			params[paramName] = strings.Join(topicSegments[i:], separator)
 			break
 		}
 		if patternSegments[i][0] == single {
@@ -90,7 +91,7 @@ func Extract(pattern string, topic string) map[string]string {
 // Fill Reverse of extract, traverse the pattern and fill in params with keys in a map.
 // Missing keys for + and # params are set to empty string.
 func Fill(pattern string, params map[string]string) string {
-	patternSegments := strings.Split(pattern, seprator)
+	patternSegments := strings.Split(pattern, separator)
 	segments := make([]string, 0, len(patternSegments))
 
 	for i := range patternSegments {
@@ -120,12 +121,12 @@ func Fill(pattern string, params map[string]string) string {
 		}
 	}
 
-	return strings.Join(segments, seprator)
+	return strings.Join(segments, separator)
 }
 
 // Clean Removes the named parameters from a pattern.
 func Clean(pattern string) string {
-	patternSegments := strings.Split(pattern, seprator)
+	patternSegments := strings.Split(pattern, separator)
 	cleanedSegments := make([]string, 0, len(patternSegments))
 
 	for i := range patternSegments {
@@ -142,5 +143,23 @@ func Clean(pattern string) string {
 		}
 	}
 
-	return strings.Join(cleanedSegments, seprator)
+	return strings.Join(cleanedSegments, separator)
+}
+
+func HasExtractions(pattern string) bool {
+	if len(pattern) == 0 {
+		return false
+	}
+
+	lastWasWildcard := false
+
+	for _, c := range pattern[:len(pattern)-1] {
+		if c != separatorRune && lastWasWildcard {
+			return true
+		} else {
+			lastWasWildcard = (c == single || c == all)
+		}
+	}
+
+	return false
 }
